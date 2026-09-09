@@ -41,10 +41,10 @@ function salvar(consultas) {
   }
 }
 
-function horarioOcupado(consultas, nova) {
-  return consultas.some(
-    (c) => c.data === nova.data && c.hora === nova.hora && c.profissional === nova.profissional
-  );
+if (horarioOcupado(consultas, nova)) {
+  mensagem.textContent =
+    `Horário ${nova.hora} já está ocupado para ${nova.profissional}. Escolha outro horário.`;
+  return;
 }
 
 function renderizar() {
