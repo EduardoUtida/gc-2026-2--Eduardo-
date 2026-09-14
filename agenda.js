@@ -106,4 +106,5 @@ formulario.addEventListener("submit", (evento) => {
   renderizar();
 });
 
+// TODO: Implementar a lógica do botão de cancelar consulta
 renderizar();
