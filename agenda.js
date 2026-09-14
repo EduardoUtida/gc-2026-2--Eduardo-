@@ -22,6 +22,7 @@ function semArmazenamento() {
 
 function carregar() {
   if (!temArmazenamento) return memoria;
+
   try {
     const salvo = localStorage.getItem(CHAVE);
     return salvo ? JSON.parse(salvo) : [];
@@ -33,7 +34,9 @@ function carregar() {
 
 function salvar(consultas) {
   memoria = consultas;
+
   if (!temArmazenamento) return;
+
   try {
     localStorage.setItem(CHAVE, JSON.stringify(consultas));
   } catch (erro) {
@@ -41,10 +44,13 @@ function salvar(consultas) {
   }
 }
 
-if (horarioOcupado(consultas, nova)) {
-  mensagem.textContent =
-    `Horário ${nova.hora} já está ocupado para ${nova.profissional}. Escolha outro horário.`;
-  return;
+function horarioOcupado(consultas, nova) {
+  return consultas.some(
+    (consulta) =>
+      consulta.profissional === nova.profissional &&
+      consulta.data === nova.data &&
+      consulta.hora === nova.hora
+  );
 }
 
 function renderizar() {
@@ -55,13 +61,21 @@ function renderizar() {
   lista.innerHTML = "";
 
   if (consultas.length === 0) {
-    lista.innerHTML = '<tr><td colspan="4" class="vazio">Nenhuma consulta agendada.</td></tr>';
+    lista.innerHTML =
+      '<tr><td colspan="4" class="vazio">Nenhuma consulta agendada.</td></tr>';
     return;
   }
 
   for (const c of consultas) {
     const linha = document.createElement("tr");
-    linha.innerHTML = `<td>${c.data}</td><td>${c.hora}</td><td>${c.profissional}</td><td>${c.paciente}</td>`;
+
+    linha.innerHTML = `
+      <td>${c.data}</td>
+      <td>${c.hora}</td>
+      <td>${c.profissional}</td>
+      <td>${c.paciente}</td>
+    `;
+
     lista.appendChild(linha);
   }
 }
@@ -79,13 +93,14 @@ formulario.addEventListener("submit", (evento) => {
   const consultas = carregar();
 
   if (horarioOcupado(consultas, nova)) {
-    mensagem.textContent = "erro";
-    formulario.reset();
+    mensagem.textContent =
+      `Horário ${nova.hora} já está ocupado para ${nova.profissional}. Escolha outro horário.`;
     return;
   }
 
   consultas.push(nova);
   salvar(consultas);
+
   mensagem.textContent = "Consulta agendada.";
   formulario.reset();
   renderizar();
